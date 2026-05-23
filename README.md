@@ -7,7 +7,7 @@ works **fully offline**.
 
 > Built as a **SPA + PWA** with **TypeScript + Vite**, deployed to **GitHub Pages**.
 
-<p align="center"><em>Midnight indigo · aged gold · starfield & grain.</em></p>
+<p align="center"><em>"The Alchemist's Almanac" — aged paper, iron-gall sepia, oxblood & verdigris, letterpress type.</em></p>
 
 ## Features
 
@@ -27,7 +27,7 @@ works **fully offline**.
 | Language       | TypeScript (strict)                         |
 | Build / dev    | Vite 6                                       |
 | PWA            | `vite-plugin-pwa` (Workbox, `autoUpdate`)   |
-| Fonts          | Self-hosted Cormorant Garamond + EB Garamond (`@fontsource`) |
+| Fonts          | Self-hosted IM Fell DW Pica + Cardo (`@fontsource`) |
 | UI             | Vanilla DOM (no framework) + hand-written CSS |
 | Hosting        | GitHub Pages via GitHub Actions             |
 

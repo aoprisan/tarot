@@ -20,8 +20,8 @@ export default defineConfig({
         description:
           'A celestial Rider–Waite tarot companion. Draw cards, read spreads, reflect.',
         lang: 'en',
-        theme_color: '#0b0a1a',
-        background_color: '#0b0a1a',
+        theme_color: '#e9dcbf',
+        background_color: '#e9dcbf',
         display: 'standalone',
         orientation: 'portrait',
         categories: ['lifestyle', 'entertainment'],

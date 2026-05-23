@@ -1,10 +1,10 @@
 import './styles.css';
-import '@fontsource/cormorant-garamond/400.css';
-import '@fontsource/cormorant-garamond/500.css';
-import '@fontsource/cormorant-garamond/600.css';
-import '@fontsource/eb-garamond/400.css';
-import '@fontsource/eb-garamond/400-italic.css';
-import '@fontsource/eb-garamond/500.css';
+import '@fontsource/im-fell-dw-pica/400.css';
+import '@fontsource/im-fell-dw-pica/400-italic.css';
+import '@fontsource/im-fell-dw-pica-sc/400.css';
+import '@fontsource/cardo/400.css';
+import '@fontsource/cardo/400-italic.css';
+import '@fontsource/cardo/700.css';
 
 import { registerSW } from 'virtual:pwa-register';
 import { cardImageUrl, CARD_BACK_URL } from './data/cards';
@@ -350,7 +350,7 @@ function render(): void {
     el('img', { class: 'masthead__emblem', src: EMBLEM, alt: '' }),
     el('h1', { class: 'gold-text' }, ['Arcana']),
     el('p', { class: 'masthead__sub' }, ['A celestial tarot companion']),
-    el('p', { class: 'rule' }, [el('span', { class: 'rule__mark' }, ['✦'])]),
+    el('p', { class: 'rule' }, [el('span', { class: 'rule__mark' }, ['❧'])]),
   ]);
 
   readingMount = renderReading();
