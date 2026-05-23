@@ -12,8 +12,10 @@ permissions:
   id-token: write
 
 # One deploy at a time; let an in-progress run finish.
+# NB: per-branch group name (not the bare "pages") to avoid colliding with a
+# stuck/zombie run that can wedge a shared concurrency group.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
