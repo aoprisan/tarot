@@ -679,6 +679,75 @@ body::after {
   background: rgba(255, 250, 235, 0.7);
 }
 
+/* ---- référentiel de naissance ------------------------------------------- */
+.date-input {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: rgba(255, 250, 235, 0.45);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.55rem 0.9rem;
+  box-shadow: inset 0 1px 2px rgba(58, 44, 27, 0.16);
+}
+.date-input:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+
+.referential {
+  margin-top: 2.5rem;
+}
+.ref-cross-wrap {
+  margin-bottom: 1.4rem;
+}
+.ref-axis-note,
+.ref-houses-note {
+  text-align: center;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0 0 1.2rem;
+}
+.ref-houses-note {
+  margin: 1.4rem 0 1.4rem;
+}
+
+.ref-cross {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    '.  n  .'
+    'w  c  e'
+    '.  s  .';
+  gap: clamp(0.6rem, 2.5vw, 1.6rem);
+  justify-items: center;
+  align-items: start;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.ref-cross .slot--n { grid-area: n; }
+.ref-cross .slot--w { grid-area: w; }
+.ref-cross .slot--c { grid-area: c; }
+.ref-cross .slot--e { grid-area: e; }
+.ref-cross .slot--s { grid-area: s; }
+.ref-cross .slot--c .card__inner {
+  box-shadow: var(--shadow-card), 0 0 0 2px var(--gold);
+}
+
+.ref-houses {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(1rem, 3vw, 1.7rem);
+}
+
+.slot--ref {
+  width: clamp(98px, 22vw, 138px);
+}
+.slot--ref .card {
+  cursor: pointer;
+}
+
 /* ---- footer ------------------------------------------------------------- */
 .colophon {
   margin-top: 4rem;

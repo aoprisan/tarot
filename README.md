@@ -15,6 +15,7 @@ works **fully offline**.
 - 🔮 **Card of the day** — deterministic per date, so it stays constant all day.
 - 🌗 **Reversible draws** — toggle reversed cards on/off.
 - 🂠 **Four spreads** — Single, Past·Present·Future, Mind·Body·Spirit, and the full Celtic Cross.
+- 🗓️ **Référentiel de Naissance** — enter a birth date to cast Georges Colleuil's chart of fourteen personal-archetype houses, laid out as the *rose des vents* cross. Arcana follow the Tarot de Marseille faithfully (VIII = Justice, XI = Strength, Le Mat = 22).
 - ✨ **Tap to flip, tap again for detail** — animated card flips with a meaning modal.
 - 📲 **Installable PWA** — offline-ready via a service worker; card faces cache as you view them.
 - ♿ Keyboard-accessible cards, reduced-motion support, responsive down to mobile.

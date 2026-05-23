@@ -10,6 +10,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { cardImageUrl, CARD_BACK_URL } from './data/cards';
 import { SPREADS, DEFAULT_SPREAD, type Spread } from './data/spreads';
 import { drawSpread, dailyCard, meaningFor, keywordsFor, type DrawnCard } from './deck';
+import { computeReferential, type ComputedHouse, type Referential } from './data/referential';
 
 // ----------------------------------------------------------------------------
 // Tiny DOM helper
@@ -239,6 +240,28 @@ function openModal(drawn: DrawnCard): void {
   modal.classList.add('is-open');
 }
 
+function openHouseModal(house: ComputedHouse): void {
+  const { card } = house;
+  modalImg.src = cardImageUrl(card);
+  modalImg.alt = card.name;
+  modalCardWrap.classList.remove('is-reversed');
+
+  modalRefs.eyebrow.textContent = `Maison ${house.n} · ${house.nameFr}`;
+  modalRefs.name.textContent = card.name;
+  modalRefs.orient.textContent = house.marseille
+    ? `${house.roman} · ${house.marseille}`
+    : `Arcane mineur · ${card.element}`;
+  modalRefs.orient.className = 'modal__orient up';
+
+  modalRefs.kw.innerHTML = '';
+  card.upright.forEach((w) => modalRefs.kw.append(el('li', {}, [w])));
+
+  modalRefs.meaning.textContent = card.uprightMeaning;
+  modalRefs.prompt.textContent = `${house.nameEn} — ${house.blurb}`;
+
+  modal.classList.add('is-open');
+}
+
 function closeModal(): void {
   modal.classList.remove('is-open');
 }
@@ -341,6 +364,134 @@ function renderDaily(): HTMLElement {
 }
 
 // ----------------------------------------------------------------------------
+// Le Référentiel de Naissance (Georges Colleuil) — a birth-date archetype chart
+// ----------------------------------------------------------------------------
+const BIRTHDATE_KEY = 'arcana:birthdate';
+let referential: Referential | null = null;
+let referentialMount: HTMLElement;
+
+function buildHouseSlot(house: ComputedHouse): HTMLElement {
+  const { card } = house;
+
+  const cardBtn = el('div', {
+    class: 'card is-revealed',
+    role: 'button',
+    tabindex: 0,
+    'aria-label': `Maison ${house.n}, ${house.nameEn}: ${card.name}. Activate for details.`,
+  });
+  cardBtn.append(
+    el('span', { class: 'card__inner' }, [
+      el('span', { class: 'card__face card__face--front' }, [
+        el('img', { src: cardImageUrl(card), alt: card.name, decoding: 'async' }),
+      ]),
+    ]),
+  );
+
+  const caption = house.marseille
+    ? `${house.roman} · ${house.marseille}`
+    : 'Arcane mineur';
+
+  const slot = el('div', { class: `slot slot--ref slot--${house.slot} is-open` }, [
+    el('span', { class: 'slot__label' }, [house.nameFr]),
+    cardBtn,
+    el('p', { class: 'slot__keywords' }, [caption]),
+  ]);
+
+  const open = () => openHouseModal(house);
+  cardBtn.addEventListener('click', open);
+  cardBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      open();
+    }
+  });
+  return slot;
+}
+
+function renderReferentialChart(): HTMLElement {
+  const container = el('div', { class: 'referential' });
+
+  if (!referential) {
+    container.append(
+      el('p', { class: 'empty' }, ['Enter a birth date to cast its chart of fourteen houses.']),
+    );
+    return container;
+  }
+
+  const byN = (n: number) => referential!.houses.find((h) => h.n === n)!;
+  const cross = el('div', { class: 'ref-cross' });
+  [3, 1, 5, 2, 4].forEach((n) => cross.append(buildHouseSlot(byN(n))));
+
+  const houses = el('div', { class: 'ref-houses' });
+  referential.houses
+    .filter((h) => h.group === 'house')
+    .forEach((h) => houses.append(buildHouseSlot(h)));
+
+  container.append(
+    el('div', { class: 'ref-cross-wrap' }, [
+      el('p', { class: 'ref-axis-note' }, ['The rose des vents — four arms and the central quintessence.']),
+      cross,
+    ]),
+    el('p', { class: 'rule' }, [el('span', { class: 'rule__mark' }, ['❧'])]),
+    el('p', { class: 'ref-houses-note' }, [
+      `The nine satellite houses — la météo read for ${referential.weatherYear}.`,
+    ]),
+    houses,
+  );
+  return container;
+}
+
+function rerenderReferential(): void {
+  const fresh = renderReferentialChart();
+  referentialMount.replaceWith(fresh);
+  referentialMount = fresh;
+}
+
+function renderReferential(): HTMLElement {
+  const stored = localStorage.getItem(BIRTHDATE_KEY) ?? '';
+  const input = el('input', {
+    type: 'date',
+    class: 'date-input',
+    'aria-label': 'Birth date',
+    max: new Date().toISOString().slice(0, 10),
+    value: stored,
+  }) as HTMLInputElement;
+
+  const cast = () => {
+    const value = input.value;
+    if (!value) return;
+    const [y, m, d] = value.split('-').map(Number);
+    if (!y || !m || !d) return;
+    localStorage.setItem(BIRTHDATE_KEY, value);
+    referential = computeReferential(y, m, d);
+    rerenderReferential();
+    referentialMount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const castBtn = el('button', { class: 'draw-btn', type: 'button' }, ['Cast the chart']);
+  castBtn.addEventListener('click', cast);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') cast();
+  });
+
+  referentialMount = renderReferentialChart();
+
+  return el('section', { class: 'section' }, [
+    el('div', { class: 'section__head' }, [
+      el('h2', { class: 'section__title' }, ['Le Référentiel de Naissance']),
+      el('p', { class: 'section__note' }, ['Your personal archetypes, after Georges Colleuil']),
+    ]),
+    el('div', { class: 'controls' }, [
+      el('div', { class: 'controls__row' }, [
+        input,
+        castBtn,
+      ]),
+    ]),
+    referentialMount,
+  ]);
+}
+
+// ----------------------------------------------------------------------------
 // Compose the page
 // ----------------------------------------------------------------------------
 function render(): void {
@@ -360,11 +511,17 @@ function render(): void {
     renderDaily(),
     renderControls(),
     readingMount,
+    renderReferential(),
     el('footer', { class: 'colophon' }, [
       el('p', {}, [
         'Imagery: the Rider–Waite–Smith tarot (Pamela Colman Smith, 1909) — public domain, via ',
         el('a', { href: 'https://commons.wikimedia.org/wiki/Category:Rider-Waite_tarot_deck', target: '_blank', rel: 'noopener' }, ['Wikimedia Commons']),
         '.',
+      ]),
+      el('p', {}, [
+        'The Référentiel de Naissance is a method of self-knowledge created by ',
+        el('a', { href: 'https://referentiel.georgescolleuil.com/', target: '_blank', rel: 'noopener' }, ['Georges Colleuil']),
+        '. Houses 6–13 follow one documented convention.',
       ]),
       el('p', {}, ['Works offline · installable · for reflection and entertainment.']),
     ]),
@@ -379,6 +536,13 @@ function render(): void {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
+
+// Restore a previously cast Référentiel so returning visitors see their chart.
+const savedBirthdate = localStorage.getItem(BIRTHDATE_KEY);
+if (savedBirthdate) {
+  const [y, m, d] = savedBirthdate.split('-').map(Number);
+  if (y && m && d) referential = computeReferential(y, m, d);
+}
 
 // Optional shareable/preview link: ?auto=<spread-id> opens with a spread already
 // drawn and revealed (e.g. ?auto=three, ?auto=celtic-cross).
