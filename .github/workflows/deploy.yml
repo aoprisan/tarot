@@ -11,11 +11,9 @@ permissions:
   pages: write
   id-token: write
 
-# One deploy at a time; let an in-progress run finish.
-# NB: per-branch group name (not the bare "pages") to avoid colliding with a
-# stuck/zombie run that can wedge a shared concurrency group.
+# One concurrent deployment; let an in-progress run finish.
 concurrency:
-  group: pages-${{ github.ref }}
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -27,6 +25,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      # Enables Pages and sets the source to GitHub Actions if it isn't already,
+      # so the deploy job doesn't depend on a manual Settings -> Pages toggle.
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
